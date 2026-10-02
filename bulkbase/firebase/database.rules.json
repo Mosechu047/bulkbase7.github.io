@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "products": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email === 'admin@bulkbase.co.ke'"
+    },
+    "orders": {
+      ".read": "auth != null && auth.token.email === 'admin@bulkbase.co.ke'",
+      "$id": {
+        ".write": "(!data.exists() && newData.child('status').val() === 'new') || (auth != null && auth.token.email === 'admin@bulkbase.co.ke')",
+        ".validate": "newData.hasChildren(['name','phone','address','items','total','status'])"
+      }
+    }
+  }
+}
