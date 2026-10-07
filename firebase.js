@@ -1,6 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDiOFKHUgAkVCgeSu_g_MmHW-eqgLzIeRg",
   authDomain: "bulkbase-20b55.firebaseapp.com",
@@ -11,6 +12,9 @@ const firebaseConfig = {
   databaseURL: "https://bulkbase-20b55-default-rtdb.europe-west1.firebasedatabase.app",
   measurementId: "G-JSYBB968NE"
 };
-const app = initializeApp(firebaseConfig);
+
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+export { app };
 export const db = getDatabase(app);
 export const auth = getAuth(app);

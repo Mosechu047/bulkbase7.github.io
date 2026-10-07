@@ -1,15 +1,76 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bulkbase admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
-<header><a class="logo" href="/admin.html">Bulk<b>base</b> admin</a><button class="btn alt hide" id="out" style="margin-left:auto">Log out</button></header>
-<div class="wrap">
-<section class="panel" id="login" style="max-width:420px"><h2>Super admin login</h2><form id="lf"><label>Email<input name="email" type="email" required style="width:100%;padding:.5rem;margin:.2rem 0 .7rem"></label><label>Password<input name="password" type="password" required style="width:100%;padding:.5rem;margin:.2rem 0 .7rem"></label><button class="btn">Log in</button></form></section>
-<div id="dash" class="hide">
-<section class="panel"><h2 id="ft">Add appliance</h2><form id="pf" class="form"><input type="hidden" name="id">
-<label>Name<input name="name" required></label><label>Category<input name="category" list="cl" placeholder="Dumbbells, Treadmills..."><datalist id="cl"></datalist></label>
-<label>Price (Ksh)<input name="price" type="number" min="1" required></label><label>Sale price (optional)<input name="sale_price" type="number" min="1"></label>
-<label>Stock<input name="stock" type="number" min="0" value="1"></label><label>Visible in shop<select name="active"><option value="1">Yes</option><option value="0">No</option></select></label>
-<label class="full">Photo (JPG, PNG or WebP, max 5 MB)<input name="image" type="file" accept="image/*"></label><label class="full">Description<textarea name="description" rows="3"></textarea></label>
-<div class="full"><button class="btn">Save appliance</button> <button type="button" class="btn alt hide" id="cancel">Cancel edit</button></div></form></section>
-<section class="panel" style="overflow:auto"><h2>Products</h2><table><thead><tr><th></th><th>Name</th><th>Price</th><th>Stock</th><th></th></tr></thead><tbody id="pt"></tbody></table></section>
-<section class="panel" style="overflow:auto"><h2>Orders</h2><table><tbody id="ot"></tbody></table></section></div></div>
-<script type="module" src="admin.js"></script></body></html>
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bulkbase | Gym equipment in Kenya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Paystack inline script -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+  <header>
+    <a class="logo" href="/">Bulk<b>base</b></a>
+    <input id="q" type="search" placeholder="Search dumbbells, treadmills, benches" aria-label="Search">
+    <button class="btn" id="cartBtn">Cart (<span id="cnt">0</span>)</button>
+  </header>
+
+  <section class="hero">
+    <h1>Build the gym you train in.</h1>
+    <p>Weights, racks, cardio machines and accessories for home gyms and commercial studios. Delivered across Kenya, paid on delivery or via Paystack.</p>
+    <a class="btn" href="#shop">Shop equipment</a>
+  </section>
+
+  <div class="perks">
+    <div><b>Free delivery</b>On orders above Ksh 2,500</div>
+    <div><b>Pay on delivery</b>Nothing upfront, anywhere in Kenya</div>
+    <div><b>24/7 support</b>Call or message any time</div>
+    <div><b>Quality guarantee</b>On every product</div>
+  </div>
+
+  <main id="shop">
+    <h2>Equipment</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <footer>
+    <b>Bulkbase</b>
+    <p>
+      Orders and enquiries: <a href="tel:+254180761348">0180 761 348</a> · sales@bulkbase.co.ke<br>
+      <a href="https://facebook.com/Bulkbase" target="_blank" rel="noopener">📘 Facebook page Bulkbase</a>
+    </p>
+  </footer>
+
+  <aside id="cart" aria-label="Cart">
+    <div class="row">
+      <h2>Your cart</h2>
+      <button class="btn alt sm" id="close">Close</button>
+    </div>
+    <div id="lines"></div>
+    <p><b>Total: <span id="total">Ksh 0</span></b></p>
+    <form id="co">
+      <label>Full name<input name="name" required></label>
+      <label>Phone<input name="phone" type="tel" required></label>
+      <label>Delivery address<textarea name="address" required rows="2"></textarea></label>
+      
+      <!-- Payment method selector -->
+      <label style="margin-top:0.5rem; font-weight:700;">Payment method</label>
+      <div style="display:flex; gap:1rem; margin:0.3rem 0 0.8rem;">
+        <label style="display:flex; align-items:center; gap:0.3rem; font-weight:400;">
+          <input type="radio" name="payment_method" value="cod" checked> Pay on delivery
+        </label>
+        <label style="display:flex; align-items:center; gap:0.3rem; font-weight:400;">
+          <input type="radio" name="payment_method" value="paystack"> Pay online (Paystack)
+        </label>
+      </div>
+
+      <button class="btn" style="width:100%">Place order</button>
+    </form>
+  </aside>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+/* style.css – unchanged, except the existing rule set remains exactly as provided. */
 :root{--ink:#1c2226;--steel:#5d6a72;--bg:#f2f3f1;--card:#fff;--hot:#e8500e;--line:#d9dcd8}
 *{box-sizing:border-box}body{margin:0;font:16px/1.5 'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--ink)}
 h1,h2,h3,.logo{font-family:'Barlow Condensed',Impact,sans-serif;text-transform:none;letter-spacing:.01em;margin:0}
