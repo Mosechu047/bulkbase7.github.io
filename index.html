@@ -3,23 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Bulkbase | Gym Supplements in Kenya</title>
+  <title>Bulkbase | Gym supplements in Kenya</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <!-- Paystack inline script -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
   <header>
     <a class="logo" href="/">Bulk<b>base</b></a>
-    <input id="q" type="search" placeholder="Search dumbbells, treadmills, benches" aria-label="Search">
+    <input id="q" type="search" placeholder="Search supplements, proteins, creatine" aria-label="Search">
+    <button class="btn alt sm" id="authBtn">Log in</button>
     <button class="btn" id="cartBtn">Cart (<span id="cnt">0</span>)</button>
   </header>
 
   <section class="hero">
     <h1>Build the gym you train in.</h1>
-    <p>Weights, racks, cardio machines and accessories for home gyms and commercial studios. Delivered across Kenya, paid on delivery or via Paystack.</p>
-    <a class="btn" href="#shop">Shop equipment</a>
+    <p>Gym Supplements. Delivered across Kenya.</p>
+    <a class="btn" href="#shop">Shop products</a>
   </section>
 
   <div class="perks">
@@ -32,38 +31,128 @@
   <main id="shop">
     <h2>Products</h2>
     <div class="tabs" id="tabs"></div>
-    <!-- Grid will be filled by app.js, styled to match the clean 2‑column look -->
     <div class="grid" id="grid"></div>
   </main>
 
   <footer>
     <b>Bulkbase</b>
     <p>
-      Orders and enquiries: <a href="tel:+254180761348">0180 761 348</a> · sales@bulkbase.co.ke<br>
+      Orders and enquiries: <a href="tel:+254180761348">0180 761 348</a> · basebulk9@gmail.com<br>
       <a href="https://facebook.com/Bulkbase" target="_blank" rel="noopener">📘 Facebook page Bulkbase</a>
     </p>
   </footer>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       AUTH MODAL — login, signup, forgot password
+       ═══════════════════════════════════════════════════════════ -->
+  <div id="authModal" class="modal hide" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2 id="authTitle">Log in</h2>
+        <button class="btn alt sm" id="authClose" aria-label="Close">✕</button>
+      </div>
+
+      <!-- ─── LOGIN FORM ─── -->
+      <form id="loginForm" class="auth-form">
+        <label>Email
+          <input name="email" type="email" required autocomplete="email">
+        </label>
+        <label>Password
+          <input name="password" type="password" required minlength="6" autocomplete="current-password">
+        </label>
+        <button class="btn" style="width:100%">Log in</button>
+        <p class="auth-alt">
+          <a href="#" id="toForgot">Forgot password?</a>
+        </p>
+        <p class="auth-alt">
+          No account? <a href="#" id="toSignup">Sign up</a>
+        </p>
+      </form>
+
+      <!-- ─── SIGNUP FORM ─── -->
+      <form id="signupForm" class="auth-form hide">
+        <label>Full name
+          <input name="name" required autocomplete="name">
+        </label>
+        <label>Email
+          <input name="email" type="email" required autocomplete="email">
+        </label>
+        <label>Phone
+          <input name="phone" type="tel" required autocomplete="tel">
+        </label>
+        <label>Password (min 6 characters)
+          <input name="password" type="password" required minlength="6" autocomplete="new-password">
+        </label>
+        <button class="btn" style="width:100%">Create account</button>
+        <p class="auth-alt">
+          Already have an account? <a href="#" id="toLogin">Log in</a>
+        </p>
+      </form>
+
+      <!-- ─── FORGOT PASSWORD FORM ─── -->
+      <form id="forgotForm" class="auth-form hide">
+        <p style="margin:0 0 .6rem; font-size:.9rem; color:var(--steel);">
+          Enter the email you used to sign up and we'll send you a reset link.
+        </p>
+        <label>Email
+          <input name="email" type="email" required autocomplete="email">
+        </label>
+        <button class="btn" style="width:100%">Send reset link</button>
+        <p class="auth-alt">
+          <a href="#" id="toLogin2">Back to log in</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CART SIDEBAR
+       ═══════════════════════════════════════════════════════════ -->
   <aside id="cart" aria-label="Cart">
     <div class="row">
       <h2>Your cart</h2>
       <button class="btn alt sm" id="close">Close</button>
     </div>
+
+    <!-- Logged-in banner -->
+    <div id="userBanner" class="hide" style="background:#f8f9fa; border:1px solid var(--line); border-radius:6px; padding:.6rem; margin-bottom:.7rem; font-size:.9rem;">
+      Logged in as <b id="userName"></b><br>
+      <small id="userEmail"></small>
+    </div>
+
     <div id="lines"></div>
     <p><b>Total: <span id="total">Ksh 0</span></b></p>
+
     <form id="co">
       <label>Full name<input name="name" required></label>
       <label>Phone<input name="phone" type="tel" required></label>
+      <label>Email<input name="email" type="email" required></label>
       <label>Delivery address<textarea name="address" required rows="2"></textarea></label>
-      
+
       <!-- Payment method selector -->
       <label style="margin-top:0.5rem; font-weight:700;">Payment method</label>
-      <div style="display:flex; gap:1rem; margin:0.3rem 0 0.8rem;">
+      <div style="display:flex; flex-direction:column; gap:0.5rem; margin:0.3rem 0 0.8rem;">
         <label style="display:flex; align-items:center; gap:0.3rem; font-weight:400;">
           <input type="radio" name="payment_method" value="cod" checked> Pay on delivery
         </label>
         <label style="display:flex; align-items:center; gap:0.3rem; font-weight:400;">
-          <input type="radio" name="payment_method" value="paystack"> Pay online (Paystack)
+          <input type="radio" name="payment_method" value="mpesa"> Pay via M-Pesa
+        </label>
+      </div>
+
+      <!-- M-Pesa Paybill details -->
+      <div id="mpesaInfo" class="hide" style="background:#f8f9fa; border:1px solid var(--line); border-radius:6px; padding:0.8rem; margin-bottom:0.8rem; font-size:0.9rem;">
+        <b>M-Pesa – Bulkbase</b><br>
+        Paybill Number: <b>247247</b><br>
+        Account Number: <b>0180761348</b><br>
+        Account Name: <b>Acha Siyat Noor</b><br>
+        <small>After paying, enter the M-Pesa confirmation code (e.g. <b>QGH7X2K9LM</b>) you receive by SMS below.</small>
+      </div>
+
+      <!-- M-Pesa confirmation code -->
+      <div id="mpesaCodeWrap" class="hide">
+        <label>M-Pesa confirmation code
+          <input name="mpesa_code" placeholder="e.g. QGH7X2K9LM" style="text-transform:uppercase;">
         </label>
       </div>
 
