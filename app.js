@@ -86,13 +86,22 @@ function render() {
    ───────────────────────────────────────────── */
 document.addEventListener('click', e => {
   const d = e.target.dataset;
+
   if (d.c !== undefined) { cat = d.c; render(); }
+
   if (d.add || d.i) {
+    // Require login before adding to cart
+    if (!currentUser) {
+      toast('Please log in to shop.');
+      openAuth('login');
+      return;
+    }
     const id = d.add || d.i;
     cart[id] = (cart[id] || 0) + 1;
     save();
     if (d.add) toast('Added to cart');
   }
+
   if (d.d) {
     if (--cart[d.d] <= 0) delete cart[d.d];
     save();
@@ -120,7 +129,7 @@ document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
 });
 
 /* ─────────────────────────────────────────────
-   AUTH MODAL — LOGIN / SIGNUP / FORGOT
+   AUTH MODAL
    ───────────────────────────────────────────── */
 const authModal  = document.getElementById('authModal');
 const authTitle  = document.getElementById('authTitle');
@@ -131,6 +140,8 @@ const authBtn    = document.getElementById('authBtn');
 const userBanner = document.getElementById('userBanner');
 const userName   = document.getElementById('userName');
 const userEmail  = document.getElementById('userEmail');
+const loginPrompt = document.getElementById('loginPrompt');
+const coForm     = document.getElementById('co');
 
 function showForm(which) {
   loginForm.classList.add('hide');
@@ -162,13 +173,11 @@ document.getElementById('toSignup').onclick  = e => { e.preventDefault(); showFo
 document.getElementById('toLogin').onclick   = e => { e.preventDefault(); showForm('login'); };
 document.getElementById('toLogin2').onclick  = e => { e.preventDefault(); showForm('login'); };
 document.getElementById('toForgot').onclick  = e => { e.preventDefault(); showForm('forgot'); };
+document.getElementById('promptLogin').onclick = () => openAuth('login');
 
-// Close when clicking outside the modal box
 authModal.addEventListener('click', e => {
   if (e.target === authModal) closeAuth();
 });
-
-// Close with Escape key
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !authModal.classList.contains('hide')) closeAuth();
 });
@@ -188,7 +197,6 @@ signupForm.onsubmit = async e => {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
 
-    // Store extra customer info in database
     await push(ref(db, 'customers'), {
       uid: cred.user.uid,
       name, email, phone,
@@ -236,27 +244,21 @@ loginForm.onsubmit = async e => {
 forgotForm.onsubmit = async e => {
   e.preventDefault();
   const f = e.target;
-  const email = f.email.value.trim();
-
   try {
-    await sendPasswordResetEmail(auth, email);
-    toast('Password reset link sent. Check your email inbox (and spam folder).');
+    await sendPasswordResetEmail(auth, f.email.value.trim());
+    toast('Password reset link sent. Check your email inbox.');
     closeAuth();
     f.reset();
   } catch (err) {
     console.error(err);
-    if (err.code === 'auth/user-not-found') {
-      toast('No account found with that email.');
-    } else if (err.code === 'auth/invalid-email') {
-      toast('Please enter a valid email address.');
-    } else {
-      toast('Could not send reset email. Please try again.');
-    }
+    if (err.code === 'auth/user-not-found')  toast('No account found with that email.');
+    else if (err.code === 'auth/invalid-email') toast('Please enter a valid email address.');
+    else                                     toast('Could not send reset email. Please try again.');
   }
 };
 
 /* ─────────────────────────────────────────────
-   AUTH STATE LISTENER
+   AUTH STATE — lock/unlock checkout
    ───────────────────────────────────────────── */
 onAuthStateChanged(auth, user => {
   currentUser = user;
@@ -266,26 +268,34 @@ onAuthStateChanged(auth, user => {
     userName.textContent = user.displayName || 'Customer';
     userEmail.textContent = user.email;
     userBanner.classList.remove('hide');
+    loginPrompt.classList.add('hide');
+    coForm.classList.remove('locked');
 
     // Auto-fill checkout fields
-    const co = document.getElementById('co');
-    if (co) {
-      if (user.displayName && !co.name.value) co.name.value = user.displayName;
-      if (user.email && !co.email.value)       co.email.value = user.email;
-    }
+    if (user.displayName && !coForm.name.value) coForm.name.value = user.displayName;
+    if (user.email && !coForm.email.value)       coForm.email.value = user.email;
   } else {
     authBtn.textContent = 'Log in';
     userBanner.classList.add('hide');
     userName.textContent = '';
     userEmail.textContent = '';
+    loginPrompt.classList.remove('hide');
+    coForm.classList.add('locked');
   }
 });
 
 /* ─────────────────────────────────────────────
-   CHECKOUT
+   CHECKOUT — blocked unless logged in
    ───────────────────────────────────────────── */
 $('#co').onsubmit = async e => {
   e.preventDefault();
+
+  if (!currentUser) {
+    toast('Please log in to place your order.');
+    openAuth('login');
+    return;
+  }
+
   const form = e.target;
   const b = Object.fromEntries(new FormData(form));
   const items = Object.entries(cart).map(([id, qty]) => {
@@ -298,7 +308,6 @@ $('#co').onsubmit = async e => {
   const total = items.reduce((a, i) => a + i.price * i.qty, 0);
   const paymentMethod = b.payment_method || 'cod';
 
-  // Validate M-Pesa code if required
   let mpesaCode = null;
   if (paymentMethod === 'mpesa') {
     mpesaCode = (b.mpesa_code || '').trim().toUpperCase();
@@ -311,7 +320,7 @@ $('#co').onsubmit = async e => {
 
   try {
     const orderData = {
-      uid: currentUser ? currentUser.uid : null,
+      uid: currentUser.uid,
       name: b.name.trim(),
       phone: b.phone.trim(),
       email: b.email.trim(),
@@ -327,7 +336,6 @@ $('#co').onsubmit = async e => {
     const r = await push(ref(db, 'orders'), orderData);
     const orderId = r.key.slice(0, 6).toUpperCase();
 
-    // Clear cart
     cart = {};
     save();
     form.reset();
@@ -337,11 +345,8 @@ $('#co').onsubmit = async e => {
     if (codeInput) { codeInput.required = false; codeInput.value = ''; }
     $('#cart').classList.remove('open');
 
-    // Re-fill name/email if still logged in
-    if (currentUser) {
-      if (currentUser.displayName) form.name.value = currentUser.displayName;
-      if (currentUser.email)       form.email.value = currentUser.email;
-    }
+    if (currentUser.displayName) form.name.value = currentUser.displayName;
+    if (currentUser.email)       form.email.value = currentUser.email;
 
     toast(`Order #${orderId} placed. We will contact you shortly.`);
   } catch (err) {

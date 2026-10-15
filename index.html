@@ -54,12 +54,8 @@
 
       <!-- ─── LOGIN FORM ─── -->
       <form id="loginForm" class="auth-form">
-        <label>Email
-          <input name="email" type="email" required autocomplete="email">
-        </label>
-        <label>Password
-          <input name="password" type="password" required minlength="6" autocomplete="current-password">
-        </label>
+        <input name="email" type="email" placeholder="Email" required autocomplete="email">
+        <input name="password" type="password" placeholder="Password" required minlength="6" autocomplete="current-password">
         <button class="btn" style="width:100%">Log in</button>
         <p class="auth-alt">
           <a href="#" id="toForgot">Forgot password?</a>
@@ -71,18 +67,10 @@
 
       <!-- ─── SIGNUP FORM ─── -->
       <form id="signupForm" class="auth-form hide">
-        <label>Full name
-          <input name="name" required autocomplete="name">
-        </label>
-        <label>Email
-          <input name="email" type="email" required autocomplete="email">
-        </label>
-        <label>Phone
-          <input name="phone" type="tel" required autocomplete="tel">
-        </label>
-        <label>Password (min 6 characters)
-          <input name="password" type="password" required minlength="6" autocomplete="new-password">
-        </label>
+        <input name="name" placeholder="Full name" required autocomplete="name">
+        <input name="email" type="email" placeholder="Email" required autocomplete="email">
+        <input name="phone" type="tel" placeholder="Phone" required autocomplete="tel">
+        <input name="password" type="password" placeholder="Password (min 6 characters)" required minlength="6" autocomplete="new-password">
         <button class="btn" style="width:100%">Create account</button>
         <p class="auth-alt">
           Already have an account? <a href="#" id="toLogin">Log in</a>
@@ -94,9 +82,7 @@
         <p style="margin:0 0 .6rem; font-size:.9rem; color:var(--steel);">
           Enter the email you used to sign up and we'll send you a reset link.
         </p>
-        <label>Email
-          <input name="email" type="email" required autocomplete="email">
-        </label>
+        <input name="email" type="email" placeholder="Email" required autocomplete="email">
         <button class="btn" style="width:100%">Send reset link</button>
         <p class="auth-alt">
           <a href="#" id="toLogin2">Back to log in</a>
@@ -120,17 +106,23 @@
       <small id="userEmail"></small>
     </div>
 
+    <!-- Login prompt (shown when NOT logged in) -->
+    <div id="loginPrompt" style="background:#fff4ee; border:1px solid var(--hot); border-radius:6px; padding:.8rem; margin-bottom:.7rem; font-size:.9rem;">
+      <b>Please log in to place your order.</b><br>
+      <button class="btn sm" id="promptLogin" style="margin-top:.5rem;">Log in / Sign up</button>
+    </div>
+
     <div id="lines"></div>
     <p><b>Total: <span id="total">Ksh 0</span></b></p>
 
     <form id="co">
-      <label>Full name<input name="name" required></label>
-      <label>Phone<input name="phone" type="tel" required></label>
-      <label>Email<input name="email" type="email" required></label>
-      <label>Delivery address<textarea name="address" required rows="2"></textarea></label>
+      <input name="name" placeholder="Full name" required>
+      <input name="phone" type="tel" placeholder="Phone" required>
+      <input name="email" type="email" placeholder="Email" required>
+      <textarea name="address" placeholder="Delivery address" required rows="2"></textarea>
 
       <!-- Payment method selector -->
-      <label style="margin-top:0.5rem; font-weight:700;">Payment method</label>
+      <p style="margin:.5rem 0 .3rem; font-weight:700;">Payment method</p>
       <div style="display:flex; flex-direction:column; gap:0.5rem; margin:0.3rem 0 0.8rem;">
         <label style="display:flex; align-items:center; gap:0.3rem; font-weight:400;">
           <input type="radio" name="payment_method" value="cod" checked> Pay on delivery
@@ -151,9 +143,7 @@
 
       <!-- M-Pesa confirmation code -->
       <div id="mpesaCodeWrap" class="hide">
-        <label>M-Pesa confirmation code
-          <input name="mpesa_code" placeholder="e.g. QGH7X2K9LM" style="text-transform:uppercase;">
-        </label>
+        <input name="mpesa_code" placeholder="M-Pesa confirmation code (e.g. QGH7X2K9LM)" style="text-transform:uppercase;">
       </div>
 
       <button class="btn" style="width:100%">Place order</button>
