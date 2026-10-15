@@ -71,7 +71,10 @@ async function refresh() {
       .map(([id, v]) => ({ id, ...v }))
       .sort((a, b) => (b.created || 0) - (a.created || 0));
 
-    $('#ot').innerHTML = o.map(x => `
+    $('#ot').innerHTML = o.map(x => {
+      const isMpesa = x.payment_method === 'mpesa';
+      const isAwaiting = x.status === 'awaiting_payment';
+      return `
       <tr>
         <td>
           #${x.id.slice(0, 6).toUpperCase()}<br>
@@ -97,9 +100,12 @@ async function refresh() {
               .map(s => `<option ${s === x.status ? 'selected' : ''}>${s.replace('_',' ')}</option>`)
               .join('')}
           </select>
+          ${isMpesa && isAwaiting
+            ? `<br><button class="btn sm" data-v="${x.id}" style="margin-top:.3rem">✓ Verify payment</button>`
+            : (x.status === 'paid' ? `<br><small style="color:#2a8">✓ Paid</small>` : '')}
         </td>
       </tr>
-    `).join('') || '<tr><td>No orders yet.</td></tr>';
+    `}).join('') || '<tr><td>No orders yet.</td></tr>';
 
   } catch (e) {
     fail(e);
@@ -174,6 +180,7 @@ F.onsubmit = async e => {
 document.addEventListener('click', async e => {
   const d = e.target.dataset;
 
+  /* Edit product */
   if (d.e) {
     const p = items.find(p => p.id === d.e),
           f = F.elements;
@@ -186,10 +193,27 @@ document.addEventListener('click', async e => {
     scrollTo(0, 0);
   }
 
+  /* Delete product */
   if (d.x && confirm('Delete this appliance?')) {
     try {
       await remove(ref(db, 'products/' + d.x));
       toast('Appliance deleted');
+      refresh();
+    } catch (err) {
+      fail(err);
+    }
+  }
+
+  /* ── Verify M-Pesa payment ── */
+  if (d.v) {
+    if (!confirm('Mark this M-Pesa payment as verified and paid?')) return;
+    try {
+      await update(ref(db, 'orders/' + d.v), {
+        status: 'paid',
+        paid_at: serverTimestamp(),
+        verified_by: auth.currentUser?.email || 'admin'
+      });
+      toast('✓ Payment verified — order marked as paid');
       refresh();
     } catch (err) {
       fail(err);
@@ -203,6 +227,7 @@ document.addEventListener('change', async e => {
     try {
       await update(ref(db, 'orders/' + e.target.dataset.o), { status: e.target.value });
       toast('Order updated');
+      refresh();
     } catch (err) {
       fail(err);
     }
