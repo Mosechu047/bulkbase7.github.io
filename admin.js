@@ -1,6 +1,10 @@
 import {db, auth} from './firebase.js';
-import {ref, get, push, update, remove, serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js';
-import {signInWithEmailAndPassword, signOut, onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import {
+  ref, get, push, update, remove, serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js';
+import {
+  signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 
 const $ = s => document.querySelector(s),
       esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -20,7 +24,7 @@ const fail = e => {
     : 'Something went wrong. Please try again.');
 };
 
-// ── Shrink uploaded image to 800px JPEG ──
+/* ── Shrink uploaded image to 800px JPEG ── */
 async function shrink(file) {
   const bmp = await createImageBitmap(file),
         k = Math.min(1, 800 / Math.max(bmp.width, bmp.height)),
@@ -31,10 +35,10 @@ async function shrink(file) {
   return c.toDataURL('image/jpeg', .8);
 }
 
-// ── Refresh products & orders ──
+/* ── Refresh products & orders ── */
 async function refresh() {
   try {
-    // Products
+    /* Products */
     const s = await get(ref(db, 'products'));
     items = Object.entries(s.val() || {})
       .map(([id, v]) => ({ id, ...v }))
@@ -62,7 +66,7 @@ async function refresh() {
       </tr>
     `).join('') || '<tr><td>No products yet. Add your first appliance above.</td></tr>';
 
-    // Orders
+    /* Orders */
     const o = Object.entries((await get(ref(db, 'orders'))).val() || {})
       .map(([id, v]) => ({ id, ...v }))
       .sort((a, b) => (b.created || 0) - (a.created || 0));
@@ -102,7 +106,7 @@ async function refresh() {
   }
 }
 
-// ── Auth state ──
+/* ── Auth state ── */
 onAuthStateChanged(auth, u => {
   $('#login').classList.toggle('hide', !!u);
   $('#dash').classList.toggle('hide', !u);
@@ -110,7 +114,7 @@ onAuthStateChanged(auth, u => {
   if (u) refresh();
 });
 
-// ── Login / logout ──
+/* ── Login / logout ── */
 $('#lf').onsubmit = async e => {
   e.preventDefault();
   const f = e.target;
@@ -123,7 +127,7 @@ $('#lf').onsubmit = async e => {
 
 $('#out').onclick = () => signOut(auth);
 
-// ── Product form ──
+/* ── Product form ── */
 const F = $('#pf');
 
 function reset() {
@@ -166,7 +170,7 @@ F.onsubmit = async e => {
   }
 };
 
-// ── Edit / delete product ──
+/* ── Edit / delete product ── */
 document.addEventListener('click', async e => {
   const d = e.target.dataset;
 
@@ -193,7 +197,7 @@ document.addEventListener('click', async e => {
   }
 });
 
-// ── Update order status ──
+/* ── Update order status ── */
 document.addEventListener('change', async e => {
   if (e.target.dataset.o) {
     try {
