@@ -306,7 +306,7 @@ $('#co').onsubmit = async e => {
   if (!items.length) return toast('Your cart is empty');
 
   const total = items.reduce((a, i) => a + i.price * i.qty, 0);
-  const paymentMethod = b.payment_method || 'cod';
+  const paymentMethod = b.payment_method || 'mpesa';
 
   let mpesaCode = null;
   if (paymentMethod === 'mpesa') {
